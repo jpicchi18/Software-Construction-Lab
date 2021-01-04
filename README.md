@@ -19,4 +19,4 @@ Course projects for the UCLA course entitled "Software Construction"
 
 [project_9](https://github.com/jpicchi18/Software-Construction-Lab/tree/main/project_9): Git and Python. Implemented a Python program that generates a topological ordering of the Git commits that are stored in the ```.git``` directory.
 
-project_10](https://github.com/jpicchi18/Software-Construction-Lab/tree/main/project_10): Report and Presentation. Picked a recent computer science innovation and wrote a report/class presentation on the topic. The topic of my report and presentation was digital twins, specifically as they are used to model urban environments.
+[project_10](https://github.com/jpicchi18/Software-Construction-Lab/tree/main/project_10): Report and Presentation. Picked a recent computer science innovation and wrote a report/class presentation on the topic. The topic of my report and presentation was digital twins, specifically as they are used to model urban environments.
