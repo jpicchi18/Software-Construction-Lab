@@ -1,5 +1,5 @@
 // Name: Joseph Picchi
-// UID:  605-124-511
+
 // Assignment 6
 // tr2b.c
 
