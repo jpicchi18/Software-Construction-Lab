@@ -1,0 +1,155 @@
+Name: Joseph Picchi
+UID:  605124511
+Assignment 4
+
+========
+lab log 
+========
+
+1. /usr/bin/ls -a -A     --> acts like the output of "ls -a"
+   /usr/bin/ls -A -a     --> acts like the output of "ls -a"
+
+   These two commands verify that the problem (ie that -a always overrides -A)
+   still occurs in "/usr/bin/ls". In other words, regardless of which of the two
+   commands above is called, the output always contains "." and "..".
+
+
+2. /usr/bin/ls --version       --> outputs "ls (GNU coreutils) 8.22", thus
+   	       		       	   indicating that the Coreutils version that
+				   "/usr/bin/ls" corresponds to is 8.22
+
+
+3. wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+				--> Downloads the Coreutils 8.29 source code
+				    compressed tarball
+
+   wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+				--> Downloads the tarball's signature
+
+   wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+				--> Downloads the GNU keyring
+
+
+4. gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
+				--> verifies the tarball's signature using the
+				    GNU keyring
+
+   Note:
+	The output of this command states
+	    "Good signature from 'P@draig Brady <P@draigBrady.com>'"
+	thus affirming that the tarball has not been altered since its
+	encryption with the developer's private key.
+
+   Note also:
+   	The output also contains the lines
+	    "WARNING: This key is not certified with a trusted signature!"
+	    "There is no indication that the signature belongs to the owner."
+	This occurs because I have not yet verified the GNU keyring. Thus,
+	unless I use my private key to sign the afforementioned public key,
+	this warning message will be displayed because I have not explicitly
+	verified that I trust that the public key actually does belong to the
+	listed person.
+
+
+5. To compile and install Coreutils into a temporary directory:
+
+   tar -xJvf coreutils-8.29.tar.xz     --> unzips (ie decompresses) the tarball.
+       	     			       	   "-x" means that we are extracting the
+					   files.
+					   "-J" means that we are filtering the
+					   archive through xz.
+					   "-v" specifies that we want verbose
+					   output.
+					   "-f" means that we are specifying a
+					   file to be decompressed.
+
+   cd coreutils-8.29/ 	--> to navigate to the newly created directory
+      			    containing the decompressed files from the tarball
+
+   cd ..
+   mkdir tempdir	--> creates a temporary directory in which I can install
+   	 		    Coreutils
+   cd tempdir
+
+   pwd			--> specifies the absolute file path, which I use in the
+   			    following command
+
+   cd ../coreutils-8.29/
+   ./configure --prefix=/u/be/ugrad/picchi/Desktop/35L/ass4/lab/tempdir
+			--> installs the Coreutils files in the "tempdir"
+			    directory.
+			    The "prefix" flag allowed us to specify "tempdir"
+			    as the directory in which the files should be
+			    installed.
+
+   make			--> compiles the files
+
+   make install 	--> installs the executable binary in "tempdir"
+
+   I did not run into any note-worthy problems.
+
+
+6. reproducing the bug:
+
+   tempdir/bin/./ls -a ~		--> output includes "." and ".."
+   tempdir/bin/./ls -A ~		--> output does NOT include "." or ".."
+   tempdir/bin/./ls -aA ~		--> output includes "." and ".."
+   tempdir/bin/./ls -Aa ~		--> output includes "." and ".."
+
+   The last two commands above indicate that the bug has been reproduced because
+   "-a" overrides "-A" and displays the "." and ".." directories, no matter
+   what order the two options are listed.
+
+7. Applying the patch of Bug#30963 Message 10:
+
+   Download the patch file at https://debbugs.gnu.org/cgi/bugreport.cgi?msg=10;
+   bug=30963;att=1;filename=0001-ls-A-now-overrides-a.patch
+					--> NOTE: "wget" did not work when I
+					    tried it with this link, so I
+					    manually downloaded it on my local
+					    machine and used "scp" to copy it
+					    to the lnxsrv
+
+   mv 0001-ls-A-now-overrides-a.patch coreutils-8.29
+					--> move the patch file into the
+					    "coreutils-8.29" directory
+
+   cd coreutils-8.29/
+   patch -p1 <0001-ls-A-now-overrides-a.patch
+					--> applies the patch to the files in
+					    "coreutils-8.29/src"
+
+   NOTE: the ouput of the last command produced the lines
+   	    	 "patching file NEWS"
+	 	 "Hunk #1 FAILED at 4."
+	 though it still appears as though "src/ls.c" was properly patched, as
+	 indicated by the lines
+	 	   "patching file src/ls.c"
+	 	   "Hunk #1 succeeded at 1900 (offset -3 lines)."
+
+
+8. building the fixed version of ls:
+
+   autoreconf -fi     --> updates the generated configuration files.
+   	      	      	  "-i" specifies that we should copy any missing
+			  auxiliary files
+			  "-f" specifies that we want to consider all files
+			  obsolete, and thus remake all of them
+   	      	      	  
+   make		      --> compiles the binary executables in the src directory,
+   		      	  but not in the "tempdir" directory that was originally
+			  specified in "./configure --prefix=...", as the
+			  intallation of the binaries in "tempdir" would require
+			  use to run the command "make install".
+
+9. Making sure the changes fix the bug:
+
+   coreutils-8.29/src/ls -a ~		--> output includes "." and ".."
+   coreutils-8.29/src/ls -A ~		--> output does NOT include "." or ".."
+   coreutils-8.29/src/ls -Aa ~		--> output includes "." and ".."
+   coreutils-8.29/src/ls -aA ~		--> output does NOT include "." or ".."
+
+   The last 2 commands listed prove that the changes did, in fact, fix the bug
+   because the command "-aA" now works properly in that the "-A" command
+   overrides the "-a" command because "-A" is listed after "-a".
+   

@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+
+#remove all instances of '?', '<u>', and '</u>', and pipe to next command
+sed -E 's/\?|<u>|<\/u>//g' $1 |
+
+#replace upper case letters with lower case letters, and pipe to next command
+tr '[[:upper:]]' '[[:lower:]]' |
+    
+#replace backtick with apostrophe, and replace dash with space
+#then pipe to next command
+tr '`-' "' " |
+
+#extract lines of the form 'A<tdX>W</td>Z' , and pipe to the next command
+grep -E "[[:blank:]]*<td[^>]*>[ pk'mnwlhaeiou]+<\/td>[[:blank:]]*" |
+
+#remove the 'A<tdX>' and '</td>Z' parts from the lines
+sed -E 's/[[:blank:]]*<td[^>]*>|<\/td>[[:blank:]]*//g' |
+
+#translate spaces into newlines, then pipe to next command
+tr -s ' ' '\n' |
+
+#sort the words, removing any duplicates
+sort -u
+
+exit

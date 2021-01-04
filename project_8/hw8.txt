@@ -1,0 +1,233 @@
+Name: Joseph Picchi
+UID : 605124511
+CS35L assignment 8
+
+========
+hw8.txt
+========
+
+1. Homework step 1:
+
+   emacs hw8.txt			--> create "hw8.txt" to log actions in
+   	 				    solving the homework
+
+
+2. Homework step 2:
+
+   cd diffutils
+   git stash				--> since the lab portion of the assignment
+       					    made multiple changes to the repository,
+					    this command saves the current state
+					    of the working tree and index while creating
+					    a clean working tree
+   
+   git checkout -b quote v3.0		--> creates a new branch called "quote" that
+       		   	 		    points to the same commit as the tag
+					    "v3.0", then switches HEAD to this new
+					    "quote" branch
+
+
+3. Homework step 3:
+
+   patch -p1 <../quote-3.0-patch.txt
+					--> installs my changes from the lab portion of
+					    the assignment into the "quote" branch
+
+
+
+4. Homework step 4:
+
+   I learned how to use the Emacs function "add-change-log-entry-other-window" (C-x 4 a)
+   through the following web pages:
+   	   https://www.gnu.org/software/emacs/manual/html_node/emacs/Change-
+	   Log-Commands.html
+					--> the link given on the assignment webpage
+					    that provides documentation for the
+					    "C-x 4 a" function
+
+ 	   https://ftp.gnu.org/old-gnu/Manuals/emacs-20.7/html_node/emacs_265.html
+					--> a webpage that offers defines and provides
+					    examples of "change logs"
+
+
+5. Homework step 5:
+
+   git status				--> genearte a list of files that have been
+       					    modified by the patch application in
+					    homework step 3. The files that have been
+					    modified are the following:
+					    	     src/cmp.c
+						     src/diff.c
+						     src/diff3.c
+						     src/dir.c
+						     src/sdiff.c
+						     src/util.c
+
+   emacs src/cmp.c			--> open the first file from the list above
+
+   C-x 4 a				--> add a new entry to the change log for
+       	 				    "src/cmp.c"
+
+   NOTE: The ChangeLog entry that I composed (modeled from the style of "ChangeLog-2008"
+   	 in the diffutils repo) is the following:
+
+	    2020-05-30  Joseph Libert Picchi  <picchi@lnxsrv06.seas.ucla.edu>
+
+		    * src/cmp.c: Quote 'like this' in output.
+		    * src/diff.c: Likewise.
+		    * src/diff3.c: Likewise.
+		    * src/dir.c: Likewise.
+		    * src/sdiff.c: Likewise.
+		    * src/util.c: Likewise.
+
+
+6. Lab step 6:
+
+   git add .				--> add the changes to modified files to
+       	   				    the staging area (ie the index)
+
+   git commit				--> creates a new commit containing the contents
+       					    of the index, and spawns a vim prompt
+					    that I used to add the ChangeLog entry
+					    as the commit message.
+					--> after saving the commit message, this
+					    command also outputs an error message
+					    stating that my name and email message
+					    were configured automatically, and the
+					    output message also contains directions
+					    and commands to change these details
+					    if they are incorrect.
+
+
+7. Homework step 7:
+
+   git format-patch -1 --stdout >../formatted-patch.txt
+				       --> uses the "git format-patch" command to
+				       	   generate a patch that is convenient for
+					   email submission or for use with "git am".
+					   "-1" allows use to format only the current
+					   commit at HEAD.
+					   "--stdout" tells the command to write the
+					   contents of the patch to stdout.
+
+
+8 Homework step 8:
+
+   git clone https://git.savannah.gnu.org/git/diffutils.git diffutils_test
+				       --> clones a new repository, placing it in the
+				       	   directory "diffutils_test"
+
+   git checkout -b patchery v3.0
+				       --> check out the clone's version 3.0 into a
+				       	   new branch "patchery"
+
+   git am ../formatted-patch.txt       --> apply the "formatted-patch.txt" patch that
+       	  			       	   we just created
+
+   Build the resulting system using the commands enumerated in the "README-hacking"
+   file in the diffutils repository. These commands are as follows:
+   
+	./bootstrap
+
+	wget https://web.cs.ucla.edu/classes/spring20/cs35L/assign/diffutils-
+	gets.diff
+					--> obtain the "additional patch" linked in step
+					    13 of the laboratory section, and save
+					    this patch in the file
+					    "diffutils-gets.diff"
+
+        patch -p0 <diffutils-gets.diff
+					--> apply the "additional patch" from lab step
+					    13
+
+   	./configure
+	make
+	make check
+					--> build the system using the rest of the
+					    commands given in "README-hacking"
+
+ 	NOTE:
+		"make check" outputs 4 errors, which are the following:
+		      make[3]: *** [Makefile:1309: basic.log] Error 126
+		      make[2]: *** [Makefile:1291: check-TESTS] Error 2
+		      make[1]: *** [Makefile:1406: check-am] Error 2
+		      make: *** [Makefile:1016: check-recursive] Error 1
+
+	verify that the system works by using the commands from step 13 of the lab:
+
+	       ./src/diff . -	       	--> works correctly: the command has correctly
+	       		    		    replaced all instances of "`" with "'"
+					    in its output to stderr
+				--> output:
+				    ./src/diff: cannot compare '-' to a directory
+
+		./src/diff --help   	--> works correctly: the command has correctly
+	       		    		    replaced all instances of "`" with "'"
+					    in its output to stderr
+					--> NOTE: output to stderr is too long to copy
+					    into this report
+
+
+
+9. Lab step 9:
+
+   make distdir				--> run the command given in the assignment
+
+   emacs diffutils-3.0.1-c690/ChangeLog
+					--> opens the ChangeLog
+					--> verifies that my ChangeLog entry works,
+					    since my entry is listed as the first
+					    entry in "diffutils-3.0.1-c690/ChangeLog"
+
+
+10. Lab step 10:
+
+    open XQuartz on local machine
+					--> prepare for X11 forwarding
+
+    ssh -Y picchi@lnxsrv06.seas.ucla.edu
+					--> ssh into the linux server with Y-forwarding
+					    enabled
+
+    cd ~eggert/src/gnu/emacs-CS-35L/
+    gitk
+					--> runs "gitk" on the directory specified in
+					    the homework 8 hints
+
+    NOTE:
+	We find the newest merge that is not newer than 2015-01-25 by scrolling down
+	the rightmost pane of the top window in the display. Until we find a merge
+	before 2015-01-25. From this procedure, the merge that we seek has the
+	following details:
+		  SHA1 ID: e5087278b9bcab5847ce63d80c0d74c27f50e719
+		  Author:  Joakim Verona <joakim@verona.se>
+		  Date:    2015-01-24 17:11:31
+
+  	My view of the mergepoint:
+	   The mergepoint shows two parallel vertical lines (representing the two
+	   different branches), which are both colored pink below the mergepoint.
+	   The mergepoint is represented as a blue dot connecting the two branches.
+
+        Roles of the subwindows I see:
+	      top left:
+	      	  A colored, graphical view of the branches in the repository, where
+		  each blue dot along the branches represents a commit. It also
+		  contains a brief description of the commit (eg "merge branch
+		  'master' into xwidget").
+	      top middle:
+	      	  A list of names, followed by emails, where each row in the list
+		  is the author of the corresponding commit in the top left pane.
+	      top right:
+	      	  A list of dates and times, where each row in the list is the date/time
+		  of the corresponding commit in the top right pane.
+	      bottom left:
+	      	  contains details about any commit that you select in the top panes.
+		  Such details include the author, commiter, parent, child, branches,
+		  follows, and precedes.
+	      bottom right:
+		  has options to display a "Patch" or "Tree" corresponding to the
+		  commit selected in the top windows. Selecting either of these options
+		  displays a list of files, which you can select to display either
+		  the corresponding diff (in the case of a "patch") or the contents
+		  of the file itself (in the case of a "tree") in the bottom left
+		  subwindow.

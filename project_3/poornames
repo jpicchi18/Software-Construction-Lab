@@ -1,0 +1,88 @@
+#! /bin/bash
+
+#------if statements and case statements---------
+
+
+# -r was passed? if so, shift
+if [[ $# -gt 0 ]] && [[ "${1}" == '-r' ]]
+then
+    RECURSIVE='true'
+    shift
+else
+    RECURSIVE='false'
+fi
+
+
+#check if any arguments passed --> store the directory in "D"
+if [[ $# -eq 0 ]]  #if no directories passed
+then
+    D='.';
+else
+    D=$1;
+fi
+
+
+#check if D is a valid directory
+if [[ ! -d ${D} ]] || [[ -h ${D} ]]  #if D is not a directory or D is symb link
+then
+    echo "error: not a valid directory: ${D}" >/dev/stderr
+    exit 1
+fi
+
+
+#check if there's 2 or more operands, or if there's a single operand with
+#first char '-'
+if [[ $# -ge 2 ]]  #if 2 or more operands
+then
+    echo "error: too many operands" >/dev/stderr
+    exit 1
+elif [[ ${D} == -* ]]  #if directory begins with '-'
+then
+    echo "error: directory name starts with '-' " >/dev/stderr
+    exit 1
+fi
+
+
+#check for permissions errors
+if [[ ! -r ${D} ]]  #if directory has no read permissions
+then
+    echo "error: no read permissions to directory ${D}" >/dev/stderr
+    exit
+fi
+
+
+#--------------non-recursive operations function----------------#
+function checkFiles() {
+
+    #extract all files immediately under D
+ #   ALLFILES=`find ${D} -maxdepth 1 -mindepth 1`
+
+    #print files with invalid chars
+    #    echo "${ALLFILES}" |
+    find ${D} -maxdepth 1 -mindepth 1 |
+    grep -Ev '\/[A-Za-z_][-A-Za-z._]{0,13}$' |   #extract files w/ invalid chars
+	xargs -d '\n' --no-run-if-empty ls -d -1 -N --show-control-chars -p
+
+    #print duplicates from the list of valid files
+    #    echo "${ALLFILES}" |
+    find ${D} -maxdepth 1 -mindepth 1 |
+	grep -E '\/[A-Za-z_][-A-Za-z._]{0,13}$' |   #extract all valid files
+	sort -f |                                   #sort, ignoring case
+	uniq -i -D |                                #print all duplicate lines
+	xargs -d '\n' --no-run-if-empty ls -d -1 -N --show-control-chars -p
+}
+
+
+
+#---------------recursion check------------------ 
+
+#if recursion -> run recursion statement
+if [[ "${RECURSIVE}" == 'true' ]]
+then
+    find ${D} -readable -type d -exec "${0}" {} \;
+else
+    checkFiles $@
+fi
+
+
+exit 0

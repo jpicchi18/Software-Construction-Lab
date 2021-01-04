@@ -1,0 +1,170 @@
+Joseph Picchi
+605124511
+Assignment 1
+Lab
+--------------
+1.
+man -k keyword
+
+In this case, "keyword" is the specific word we are searching for in the commands' man pages. I discoverd this by running the command "man man", which provided a man page with a description of the function of the command "man -k keyword" (the keyword was actually "printf" in the man the man page).
+
+
+2.
+mv is located in the directory /usr/local/cs/bin/
+sh is located in the directory /usr/bin/
+
+shell commands I used:
+which mv   --> to find the location of the mv program
+which sh   --> to find the location of the sh program
+
+
+3.
+/usr/bin/tr  --> translates or deletes characters
+/usr/bin/ar  --> creates, modifies, and extracts from archives
+/usr/bin/pr  --> converts text files for printing
+
+shell commands I used:
+man find    --> to learn how to search for executables
+find /usr/bin -name ?r -executable   --> to search for programs with the given specifications, since "?" signifies any possible character
+man tr      --> to find what tr does
+man ar      --> to find what ar does
+man pr      --> to find what pr does
+
+
+4.
+The file that is actually executed is "/usr/bin/emacs-24.3"
+
+shell commands I used:
+ls -l /usr/bin/emacs   		--> found that /usr/bin/emacs is a symbolic link to /etc/alternatives/emacs
+ls -l /etc/alternatives/emacs   --> found that /etc/alternatives/emacs is a symbolic link to /usr/bin/emacs-24.3
+ls -l /usr/bin/emacs-24.3   	--> found that /usr/bin/emacs-24.3 is the file being executed
+
+
+5.
+The version number of "/usr/bin/gcc" is 4.8.5
+The version number of the plain gcc program is 9.3.0
+
+The two programs differ because the plain gcc program is located in "/usr/local/cs/bin/", since this is the first directory in the PATH that the shell searches when you type the command "gcc". "/usr/bin/gcc" is is a gcc program located in a different directory that is searched in lower precedence compared to "/usr/local/cs/bin/".
+
+6.
+The given symbolic mode means that we are changing the permissions on the file in 3 ways:
+(1) allowing all users to execute the file with owner permissions
+(2) giving the owner permission to execute the file
+(3) removing permission for others (those who are not the owner and not in the group) to write to the file
+
+
+7.
+Total number of entries: 446
+First 5 entries:
+/usr/local/cs
+/usr/local/cs/src/git
+/usr/local/cs/src/git/RCS
+/usr/local/cs/src/coreutils
+/usr/local/cs/src/coreutils/RCS
+
+shell commands I used:
+find /usr/local/cs -type d -mtime -28   --> [-type d] specifies that we are searching for directories, and [-mtime -28] indicates that we are searching for those modified in the last 28 days = 4 weeks.
+
+
+8.
+# symbolic links in the same directory as find = 280
+
+shell commands:
+whereis find   			--> to discover that "find" is located in the directory "/usr/bin/"
+find /usr/bin -type l > count   --> to find all of the symbolic links in the directory "/usr/bin" and
+					place the output of the function in a file called "count"
+man wc  			--> to discover how to use "wc"
+wc -l count   			--> to display the number of lines in the "count" file (ie the
+					number of symbolic links in the same directory as find)
+
+
+9.
+oldest file: librom1394.so.0.3.0
+last modified: Dec 28, 2013
+Age: 6 years + 3 months + 8 days
+
+shell commands used:
+man ls   	     --> to discover that "-a" includes entries starting with ".", "-l" displays a long list with modification dates, and "-t" sorts by time with the newest file first
+ls /usr/lib64 -alt   --> to generate a list of files, including those with ".", that lists the oldest file last
+
+
+10. 
+The "locale" command gets its data from the settings of certain environment variables.
+
+shell comands used:
+man locale   --> the answer was found in the "description" section
+
+
+11.
+downcase-dwim
+downcase-region
+downcase-word
+
+emacs commands used:
+C-h a
+d o w n c a s e return
+
+
+12. 
+C-M-r   --> runs the command isearch-backward-regexp, which performs an
+	    incremental search backward for regular expession
+C-M-s   --> runs the command isearch-forward-regexp, which performs an
+	    incremental search forward for regular expression
+C-M-t   --> runs the command transpose-sexps, which transposes sexps
+C-M-u   --> runs the command backward-up-list, which moves backward out of one
+	    level of parentheses
+C-M-v   --> runs the command scroll-other-window, which scrows the next
+	    window up ARG lines (full screen if no ARG)
+
+emacs commands:
+C-h k   --> provides a description of the keyboard command inputed directly
+    	    after it
+C-M-r through C-M-v   --> each was inputed separately after "C-h k" so as to
+      	      	      	  display descriptions of their functions
+
+
+13.
+"C-g" runs the command keyboard-quit, signals a 'quit' condition. During
+execution of Lisp code, this character causes a quit directly. At top level,
+as an editor command, this simply bleeps. Quitting with 'C-g' is the way to
+get rid of a partially typed command, or a numeric argument that you don't
+want. Furthermore, if you are in the middle of a command that is running,
+'C-g' stops the command in a relatively safe way.
+
+emacs commands:
+C-h k C-g   --> provides concise information about the command 'C-g'
+C-h K C-g   --> provided more extensive documentation about the command
+
+
+14.
+the yank function reinserts ("pastes") the last stretch of killed text. In
+other words, in reinserts the most recent kill, which is the stretch of
+killed text that was most recently killed or yanked. If you perform a yank,
+then perform another directly after, it will cycle through the kills from
+most recent to least.
+
+You can easily invoke yank using C-y.
+
+emacs commands:
+C-h f   --> provided a description of the functionality and keystrokes
+    	    associated with yank
+
+
+15.
+The difference in output is that the "ls -l" command displays less entries
+than the directory listing of the dired command. The "ls -l" command only
+shows 236664 entries compared to the dired command's 236748. Dired's listing
+number is equivalent to that displayed by "ls -la", thus indicating that dired
+automatically displays files beginning in ".", whereas "ls -l" ignores such
+entries unless the "-a" argument is appended.
+
+shell commands:
+ls -l /usr/bin   --> displayed the directory contents using the "ls -l"
+      		     command
+
+emacs commands
+C-h i		    --> to navigate to the info directory
+m Emacs Enter 	    --> to navigate to the Emacs manual from the info
+  		    	directory
+C-s dired Enter    --> to retrieve the description of the dired command
+C-s d /usr/bin Enter --> to run the dired command on the "/usr/bin" directory

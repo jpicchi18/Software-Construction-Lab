@@ -1,0 +1,271 @@
+Name: Joseph Picchi
+UID: 605124511
+CS35L Assignment 9
+
+=========
+Lab9.txt
+=========
+
+1. ls -a ~eggert/src/gnu/emacs-CS-35L
+					--> list all files and directories in
+					    "ls -a ~eggert/src/gnu/emacs-CS-35L", just
+					    for reference
+
+
+   How much disk space is used to represent the working files?
+   
+   du --block-size=KB -c --exclude=.git ~eggert/src/gnu/emacs-CS-35L
+					--> estimates the file space usage of all
+					    working files in the directory (ie
+					    all files except the ".git" directory)
+					--> "--block-size=KB" sets the unit
+					    size to KB.
+					--> "-c" produces a grand total of all
+					    space usage counts in the list.
+					--> "--exclude=.git" excludes the directory
+					    named ".git"
+					--> output: 169939kB
+					    (NOTE: there was other output before this,
+					    but this is the only part that we care
+					    about)
+
+    NOTE:
+	The amount of disk space used to represent the working files is
+	169,939 kB, as indicated by the output of the above command.
+
+
+   How much is used to represent the Git repository?
+
+   du --block-size=KB -c ~eggert/src/gnu/emacs-CS-35L/.git
+					--> estimates the file space usage of
+					    files in the ".git" directory (ie all
+					    files in the Git repository)
+					--> output: 434541kB
+					    (NOTE: there was other output before this,
+					    but this is the only part that we care
+					    about)
+
+   NOTE:
+	The amount of disk space used to represent the Git repository is
+	434,541 kB, as indicated by the output of the prior command.
+
+
+   What file or files consume most of the repository space and why?
+
+   du --block-size=kB -a ~eggert/src/gnu/emacs-CS-35L/.git | sort -g
+      		      	 		--> estimates the file space usage of all
+					    files in the ".git" directory, sorting
+					    the output so that the largest files
+					    appear at the bottom of the list
+					--> "-a" writes counts for all of the files,
+					    not just directories
+					--> "sort -g" applies a general numeric sort,
+					    from least to greatest
+					--> NOTE: this command outputs the space usage
+					    for each file on a separate line,
+					    then it sorts those lines
+
+	--> output (NOTE: only the last 4 lines are shown for convenience):
+
+	325788kB	/u/cs/fac/eggert/src/gnu/emacs-CS-35L/.git/objects/pack/pa \
+	                ck-24e56b1749b9320c560213d9045fa6cee42b4174.pack
+	425075kB	/u/cs/fac/eggert/src/gnu/emacs-CS-35L/.git/objects/pack
+	433161kB	/u/cs/fac/eggert/src/gnu/emacs-CS-35L/.git/objects
+	434541kB	/u/cs/fac/eggert/src/gnu/emacs-CS-35L/.git
+
+   NOTE:
+	The files that consume most of the repository space are git object files, or,
+	to be more specific, the entire ".git/objects" directory that contains all
+	of these object files.
+	The reason for this is that the object files are the data structures that
+	are responsible for storing the actual contents of the commits themselves,
+	which constitutes the majority of the data stored in the repository. Of
+	course, tags are slightly different in the sense that they don't store the
+	commit data itself, but they also contribute to the large space consumption
+	exhibited by the ".git/objects" directory.
+
+
+2. How many branches are local to the repository?
+
+   cd ~eggert/src/gnu/emacs-CS-35L
+					--> navigate to the given directory
+
+   git branch | wc -l			--> outputs a list of all of the local
+       	      	   			    branches of the repository, with each branch
+					    on a seperate line, then feeds this into
+					    the "wc -l" command that counts the number
+					    of newlines
+					--> output: 176
+
+   NOTE:
+	176 branches are local to the repository.
+
+
+   How many are remote?
+
+   git branch -r | wc -l		--> outputs a list of all of the remote
+       	      	   			    branches of the repository, with each branch
+					    on a seperate line, then feeds this into
+					    the "wc -l" command that counts the number
+					    of newlines
+					--> output: 177
+
+   NOTE:
+	177 branches are remote.
+
+
+3. How many repositories are remote to this repository, and where are they?
+
+   cd ~eggert/src/gnu/emacs-CS-35L
+					--> navigate to the repository
+
+   git remote -v			--> outputs a list of the remote repository
+       	      				    shortnames, along with the URLs that Git
+					    has stored for the shortname (where the URLs
+					    are used when reading and writing to the
+					    remote).
+					--> "-v" specifies that we want to display the
+					    URLs along with the shortnames.
+	--> output:
+	     origin	/u/cs/fac/eggert/src/gnu/emacs (fetch)
+	     origin	/u/cs/fac/eggert/src/gnu/emacs (push)
+	     savannah	https://git.savannah.gnu.org/git/emacs.git (fetch)
+	     savannah	https://git.savannah.gnu.org/git/emacs.git (push)
+
+   NOTE:
+	2 repositories are remote to this repository: "origin" and "savannah".
+	"origin" is located at the URL "/u/cs/fac/eggert/src/gnu/emacs".
+	"savannah" is located at the URL "https://git.savannah.gnu.org/git/emacs.git".
+
+
+4. What are the ten local branches most recently committed to? List their names
+   in order of commit date, most recent first.
+
+   git for-each-ref --sort=-committerdate --count=10 refs/heads/*
+       		    		      --> displays a list of refs in the folder
+				      	  "refs/heads/" (ie displays a list of local
+					  branches).
+				      --> "--sort=-committerdate" sorts the list by
+				      	  decending order of commit date, so the
+					  branches with the most recent commit dates
+					  are listed first
+				      --> "--count=10" displays only the first 10
+				      	  items in the list.
+
+   NOTE:
+	The ten local branches most recently committed to, listed from most to least
+	recent commit date, are:
+	       refs/heads/master
+	       refs/heads/emacs-26
+	       refs/heads/netsec
+	       refs/heads/wallet
+	       refs/heads/pdumper
+	       refs/heads/elparized-core
+	       refs/heads/widen-less
+	       refs/heads/emacs-25
+	       refs/heads/comment-cache
+	       refs/heads/nick.lloyd-bytecode-jit
+
+	 (NOTE: we could delete the path "refs/heads" to just get the branch name
+	  itself, but I chose to keep it for convenience)
+
+
+5. How many commits are in the master branch?
+
+   git rev-list --count master
+					--> outputs a count of the number of commits
+					    in the "master" branch (ie the number of
+					    commits reachable by following the parent
+					    links, starting from the commit pointed
+					    to by "master").
+					--> output: 141268
+
+   NOTE:
+	There are 141,268 commits in the master branch.
+
+
+6. What percentage of the commits that are in any branch, are also in the master branch?
+
+   git rev-list --count --all 	       --> outputs a count of the number of commits
+       				       	   that are in any branch in the repository
+					   (ie the number of commits reachable by
+					   following the parent links, starting from
+					   any branch in the "refs/" directory).
+				       --> output: 145595
+
+  NOTE:
+	The percentage of commits in the master branch (relative to the amount of
+	commits in any branch) is:
+		percentage = # of commits in "master"/# of commits in all branches
+			   = 141,268/145,595
+			   = 0.970
+			   = 97%
+
+
+7. Which ten people authored the most master-branch commits that were committed in
+   the year 2013 or later, and how many commits did each of them author during that
+   period?
+
+   git shortlog -n --branches=master --since="01 Jan 2013" -s
+       		   		       --> lists the authors of commits to the branch
+				       	   "master", sorted by the number of commits
+					   since the year 2013 for each author.
+				       --> displays the number of commits since 2013
+				       	   in the first column and the author name
+					   corresponding to each commit count in the
+					   2nd column.
+				       --> "-n" specifies that we want to sort by
+				       	   number of commits per author
+				       --> "-s" suppresses commit descriptions and
+				       	   gives a commit count summary only
+				       --> "--since="01 Jan 2013" shows only commits
+				       	   on "01 Jan 2013" or later
+				       --> "--branches=master" ensures that we only
+				       	   counter master branch commits.
+
+   NOTE:
+	From the output of the prior command, we take the top 10 rows from the list,
+	showing the author name in the 2nd column and the number of master-branch
+	commits in the first:
+	      3922  Eli Zaretskii
+	      3792  Glenn Morris
+	      3784  Paul Eggert
+	      1887  Stefan Monnier
+	      1833  Lars Ingebrigtsen
+	      1671  Michael Albinus
+	       671  Dmitry Gutov
+	       604  Noam Postavsky
+	       568  Juri Linkov
+	       506  Alan Mackenzie
+
+
+8. Use the gitk command to visualize the commit graph in this repository.
+   Draw a diagram relating the following commits to each other.
+
+   open xQuartz on local computer       --> prepare for Y-forwarding
+
+   ssh -Y picchi@lnxsrv06.seas.ucla.edu
+					--> ssh into SEASnet with Y-forwarding
+					    enabled
+
+   cd ~eggert/src/gnu/emacs-CS-35L
+   gitk
+					--> navigate to the repository and use "gitk"
+					    to visualize the commit graph (along with
+					    other information about the commits in
+					    the repo)
+
+   NOTE:
+	To find which commits are merge commits, I copied each of the SHA1 ID
+	numbers given in the assignment webpage into the field next to
+	"SHA1 ID:" in the gitk browser, then I clicked "Goto:".
+
+	The gitk browser proceeeded to highlight the commit with the given
+	SHA1 ID number in the top 3 subwindows, and it displayed information about
+	the commit in the bottom 2 subwindows.
+	
+	Using the graphical display in the top left subwindow and the description
+	in the bottom left subwindow, I found that the following are merge commits:
+		  0c06b93c1e467debd401eb0b3be4652fde14fa95
+		  abcb2e62dae6aa26308f7ac9efc89247f89cbe65
+		  98ac36efe4ce4bd3a0bca76fc73ce6c7abaa4371

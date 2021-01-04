@@ -1,0 +1,95 @@
+Name: Joseph Picchi
+UID:  605124511
+Assignment 4
+
+============
+Homework Log
+============
+
+1. When we run the "time" command to measure different execution times of "ls",
+   the following output is obtained:
+   	    time coreutils-8.29/src/ls -aA ~	--> outputs ".003s" for "real" 
+	    time tempdir/bin/ls -aA ~	   	--> outputs ".006s" for "real"
+
+   This indicates that the patch improves the performance of ls, since it
+   reduces the time required to execute the command. This makes sense because
+   the patch eliminates an if statement and replaces it with straight-line code
+   (ie it replaces the if statement with just the body of the if statement).
+   Thus, the patched version has impoved performance in functionality because
+   the original bug is fixed, and it has improved performance in time efficiency
+   because it no longer has to check the condition in the if statement.
+
+
+2. If the company adopts the patched version, we should watch out for existing
+   scripts that use the ls command, as they may rely on the behavior of the
+   un-patched version for proper performance. Thus, adopting the patched version
+   could introduce unforseen errors in existing code or scripts that were
+   written to accomodate the way "ls" used to work.
+
+
+3. python randline.py /dev/null  --> invokes the randline.py script on the empty
+   	  	      		     file /dev/null
+
+   The script returns the following error messages:
+
+       Traceback (most recent call last):
+	 File "randline.py", line 70, in <module>
+    	   main()
+	 File "randline.py", line 64, in main
+    	   sys.stdout.write(generator.chooseline())
+  	 File "randline.py", line 34, in chooseline
+    	   return random.choice(self.lines) #randomly picks an element from
+	   lines
+  	 File "/usr/local/cs/Python-2.7.17/lib/python2.7/random.py", line 277,
+	 in choice
+    	   return seq[int(self.random() * len(seq))]  # raises IndexError if seq
+	   is empty
+	 IndexError: list index out of range
+
+   The error occurs because, in the line "return random.choice(self.lines)",
+   the script is attempting to randomly select a line from "self.lines", even
+   though "self.lines" contains no elements because "/dev/null" is empty. We
+   know that this action causes errors because the "random.py" module states
+   in its comment that the "choice" method "raises an IndexError if seq is
+   empty", since the index is out of range. Thus, when we pass "self.lines"
+   as "seq" in "choice(seq)", "self.lines" causes the script to raise an
+   IndexError because "self.lines" is empty.
+
+
+4. python3 randline.py		--> attempts to invoke the script with Python 3
+
+   The script ouputs the following error:
+
+       File "randline.py", line 65
+       	  except IOError as (errno, strerror):
+	  	 	    ^
+       SyntaxError: invalid syntax
+
+   This error occurs because exceptions are iterable in Python 2, but this is
+   NOT the case for Python 3. Thus, we recieve an error because the Python 3
+   does not recognize the code as being syntactically valid. To fix this, we
+   must rewrite the code by replacing the invalid line with something like
+   "except IOError as e:", as this would be valid in Python 3.
+
+
+5. python2 shuf.py dummyfile 	 --> this invokes my script with Python 2
+
+   Invoking the script with python 2 produces the following error message:
+
+   	    File "shuf.py", line 78
+    	    	print("error: input range must be LO-HI such that 0<=LO<=HI",
+		file=sys.stderr)
+		    ^
+
+	    SyntaxError: invalid syntax
+
+   The reason for this error is that Python 2 does not support the method I used
+   for writing to stderr, as that is a new feature of Python 3. Thus, Python 2
+   throws an error because it is incompatible with statements of the form
+   	 "print('error message', file=sys.stderr)"
+
+   If I were to alter the script in order to make it compatible with Python 2
+   (albeit it would no longer be compatible with Python 3), I would have to
+   change the afformentioned line to
+   	"print >> stderr, 'error message'"
+   as this is Python 2's way of writing to stderr.

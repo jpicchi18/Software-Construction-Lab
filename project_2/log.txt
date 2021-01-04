@@ -1,0 +1,75 @@
+Joseph Picchi
+605124511
+Assignment 2
+Lab Log
+
+===========================================
+log.txt : a log of all steps during the lab
+===========================================
+
+(I treated lnxsrv09 as the client (ie my personal machine), and I treated lnxsrv10 and lnxsrv07
+ as servers)
+
+1. Installed XQaurtz at https://www.xquartz.com to enable X11 forwarding on MacOS
+
+
+2. ssh -X picchi@lnxsrv09.seas.ucla.edu
+
+   This logged me into lnxsrv09.seas.ucla.edu with X11 forwarding enabled. I will be using
+   lnxsrv09 as the "client" for the purposes of this lab.
+
+
+3. cd ~/.ssh
+   
+   This navigated me to the directory ~/.ssh
+
+
+4. ssh-keygen	--> to generate a pair of public and private keys
+   return	--> to select the default location as the file into which the key
+   		    should be stored
+   (passphrase) --> entered a passphrase because the shell outputs 2 prompts to enter and verify
+   		    (respectively) a passphrase to locally encrypt the private key 
+
+5. ssh-copy-id picchi@lnxsrv10.seas.ucla.edu
+
+   This copies the public key generated in part 4 from the client (lnxsrv09) to the server
+   (lnxsrv10) for key-based authentification.
+
+6. Log out of the host, then log back in. We are now ready to test the ability of OpenSSH to
+   establish convenient connections. (For me, this step consisted of opening terminal for macOS
+   on my personal machine and typing the command "ssh -Y picchi@lnxsrv09.seas.ucla.edu" to log
+   into the lnxsrv09 "client" with port forwarding).
+
+   Run XQuarts on the client.
+
+7. eval `ssh-agent`
+
+   runs the ssh-agent daemon in the background of lnxsrv09 (the client), thus allowing us to cache
+   the private key using the command in step 8.
+
+8. ssh-add
+
+   adds the client's private key to ssh-agent (the authentification agent) using the default
+   path-to-private-key, which is ~/.ssh/id_rsa. This is the one step that requires me to type my
+   passphrase into ssh-agent.
+
+9. multi-hop ssh can be accomplished in 2 ways:
+
+   (A) ssh -AY picchi@lnxsrv10.seas.ucla.edu
+       ssh -AY picchi@lnxsrv07.seas.ucla.edu
+
+   (B) ssh -AY -t picchi@lnxsrv10.seas.ucla.edu ssh -AY picchi@lnxsrv07.seas.ucla.edu
+
+   Method (A) requires 2 steps, where the first is to ssh into lnxsrv10 and the second is to ssh
+   into lnxsrv07. Method (B) only requires one step, which is the single command that directly
+   establishes a daisy-chain connection from lnxsrv09 (client) to lnxsrv07 (final server).
+
+   Neither (A) nor (B) requires me to type a password. "-A" forwards the cached information
+   associated with ssh-agent to each server, "-t" forces a pseudo tty to be allocated so
+   that an interactive shell session is established on the final host, ad "-Y" enables port
+   forwarding to the final server (lnxsrv07).
+
+10. xeyes
+
+    The port-forwarding procedures discussed in the preceding steps successfully display the
+    xeyes GUI on my local machine, even though the program is running on lnxsrv07.

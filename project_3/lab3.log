@@ -1,0 +1,272 @@
+Joseph Picchi
+605124511
+Assignment 3: Shell Scripting
+Lab
+
+========
+lab3.log
+========
+
+1) emacs .profile     --> opened the .profile file for editing
+   export LC_ALL='C'  --> ensures that the standard C locale is set at
+   	  	      	  the beginning of each shell session (since the
+			  command was placed into ".profile")
+   locale	      --> check to make sure the locale was set correctly
+
+1) to sort the contents of /usr/share/dict/words :
+
+   sort /usr/share/dict/words >words
+				--> sorted the words in /usr/share/dict/words
+   			            according to the ASCII character codes of
+				    their letters, placing one word on each line.
+				    Words that begin with lower-value ASCII
+				    letters appear before their counterparts
+				    (ie capital letters appear before lowercase)
+
+2) to obtain a copy of assignment 3's HTML web page as a text file:
+
+   wget https://web.cs.ucla.edu/classes/spring20/cs35L/assign/assign3.html
+					--> copied the HTML web page into a text file
+					    named assign3.html
+
+3) cat assign3.html | tr -c 'A-Za-z' '[\n*]'
+       		      	    	     --> replaced every non-alphabetical character
+				     	 (ie the complement of all uppercase and
+					 lowercase letters) with a single newline
+					 character
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]'
+       		      	     	    --> in addition to the effects of the prior command
+				    	this one first replaces non-alphabetical
+					characters with newline characters, then the
+					-s flag causes it to squeeze (ie replace)
+					repeated, consecutive occurances of that
+					newline character with a single occurance of the
+					newline character, thus eliminating spaces
+					between lines of non-whitespace characters.
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | sort
+       		      	     	   --> performs the afforementioned processes, producing
+				       lines of alphabetical characters with only one
+				       newline character between each line. It then
+				       sorts the output line-by-line according to the
+				       ASCII values of the letters, with lower ascii
+				       values appearing first (so lines starting with
+				       A-Z appear before lines starting with a-z).
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | sort -u
+       		      	     	  --> performs the afforementioned processes, then
+				      replaces duplicate lines with single occurances
+				      of those lines, thus replacing duplicate words
+				      with single occurances.
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+       		      	     	  --> performed the afforementioned processes, then
+				      compared the sorted list of words from
+				      assign3.html with the sorted list of words in
+				      "words", thus producing a list of common and
+				      unique word occcurances for the files. The "-"
+				      after "comm" signifies that stdin (ie
+				      assign3.html) should be placed as the first
+				      argument to "comm". Thus, words
+				      unique to assign3.html appear in the first column,
+				      those unique to "words" appear in the second
+				      column, and those common to both appear in the
+				      third column.
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+       		      	     	  --> performs the aforementioned processes, and the
+				      "-23" option after "comm" also prevents the second
+				      and second third from being displayed (see
+				      the description of the last command for
+				      explanations of the 3 columns). Thus, the effect
+				      is to only display words that are unique to
+				      the first file (assign3.html), thereby acting
+				      as a spellchecker for assign3.html if we assume
+				      that "words" contains a complete dictionary
+				      of English words.
+
+4) wget https://www.mauimapp.com/moolelo/hwnwdshw.htm
+		--> obtains a copy of the HTML webpage at the above link, which contains
+		    the desired Hawaiian words, and it saves that webpage in a file
+		    named "hwnwdshw.htm"
+
+5) the following is my commented shell script "buildwords" :
+
+#!/usr/bin/bash
+
+#remove all instances of '?', '<u>', and '</u>', and pipe to next command
+sed -E 's/\?|<u>|<\/u>//g' $1 |
+
+#replace upper case letters with lower case letters, and pipe to next command
+tr '[[:upper:]]' '[[:lower:]]' |
+
+#replace backtick with apostrophe, and replace dash with space
+#then pipe to next command
+tr '`-' "' " |
+
+#extract lines of the form 'A<tdX>W</td>Z' , and pipe to the next command
+grep -E "[[:blank:]]*<td[^>]*>[ pk'mnwlhaeiou]+<\/td>[[:blank:]]*" |
+
+#remove the 'A<tdX>' and '</td>Z' parts from the lines
+sed -E 's/[[:blank:]]*<td[^>]*>|<\/td>[[:blank:]]*//g' |
+
+#translate spaces into newlines, then pipe to next command
+tr -s ' ' '\n' |
+
+#sort the words, removing any duplicates
+sort -u
+
+exit
+
+
+6) cat hwnwdshw.htm | ./buildwords
+			--> tests the shell script for the desired output.
+       		      	    When run on lnxsrv06, the script produced a
+			    list of Hawaiian (and some English) words in the
+			    correct format. No bugs were detected.
+   cat hwnwdshw.htm | ./buildwords | wc -l
+       		      	--> counts the number of lines in the shell script,
+			    which in this case outputed a result of "301",
+			    thus indicating that there are 301 total words
+			    in the script output.
+
+7) cat hwnwdshw.htm | ./buildwords >hwords
+		      		    --> saves the output of buildwords in hwords
+
+8) My HAWAIIANCHECKER command:
+
+   tr '[[:upper:]]' '[[:lower:]]' | tr -cs "'a-z" '[\n*]' | sort -u |
+   comm -23 - hwords
+      			       --> translates upper case letters to lower case,
+				   then performs the same command as
+				   ENGLISHCHECKER, with the differences being
+				   that 'A-Za-z' is switched to "'a-z" because
+				   we now want to replace the complement of
+				   a-z and the apostrophe with a newline. The
+				   only other difference is that "words" has
+				   been changed to "hwords", as we are now
+				   assuming that "hwords" is the dictionary
+				   against which we desire to check spelling.
+
+9) testing the HAWAIIANCHECKER command:
+
+   wget https://web.cs.ucla.edu/classes/spring20/cs35L/assign/assign3.html
+				   --> extracts the assignment HTML  webpage and
+				       saves it in a file called "assign3.html"
+
+   cat assign3.html | tr '[[:upper:]]' '[[:lower:]]' | tr -cs "'a-z" '[\n*]' |
+   sort -u | comm -23 - hwords | wc -l
+       		      	 	   --> # mispelled Hawaiian words on assignment 3
+				       webpage = 575
+       		      	 	   --> runs HAWAIIANCHECKER on the assignment 3
+				       webpage (ie "assign3.html"), produces
+				       a list of words that are mispelled
+				       (according to the list of hawaiian words in
+				       "hwords"), and counts the number of mispelled
+				       words using using "wc -l".
+					  
+
+   cat hwords | tr '[[:upper:]]' '[[:lower:]]' | tr -cs "'a-z" '[\n*]' |
+   sort -u | comm -23 - hwords
+       	      	   		   --> # mispelled Hawaiian words in "hwords" = 0
+       	      	   		   --> runs HAWAIIANCHECKER on "hwords" and writes
+				       no output to stdout, which is what we should
+				       expect because all words in hwords should
+				       also appear in hwords
+
+10) Counting the number of distinct mispelled words on the assignment 3 webpage:
+
+   Number of distinct mispelled words according to ENGLISHCHECKER = 42
+   Number of distinct mispelled words according to HAWAIIANCHECKER = 575
+
+   commands used:
+
+   cat /usr/share/dict/words | tr '[[:upper:]]' '[[:lower:]]' | sort >words
+       			       	   --> create a lowercase, sorted list of english
+				       words. This is considered to be the English
+				       dictionary.
+
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | tr '[[:upper:]]' '[[:lower:]]' |
+   sort -u | comm -23 - words | wc -l
+  		      	     	   --> output: 42
+				   --> runs ENGLISHCHECKER on the assignment 3 HTML
+				       webpage (ie "assign3.html") and pipes the
+				       result to "wc -l", which displays a count
+				       of the number of newline characters (ie the
+				       number of distinct mispelled words).
+				   --> the only difference with this command compared
+				       the ENGLISHCHECKER from before is that this
+				       command performs the same input, plus it
+				       converts all uppercase words in "assign3.html"
+				       to lowercase.
+
+   cat assign3.html | tr '[[:upper:]]' '[[:lower:]]' | tr -cs "'a-z" '[\n*]' |
+   sort -u | comm -23 - hwords | wc -l
+       		      	 	   --> output = 575
+       		      	 	   --> runs HAWAIIANCHECKER on the assignment 3 HTML
+				       webpage (ie "assign3.html") and pipes the
+				       result to "wc -l", which displays a count of
+				       the number of newlines (ie the number of
+				       distinct mispelled words on the webpage,
+				       according the hwords).
+
+
+10) Comparing the number of mispelled words generated by each checker:
+
+   Number of words that ENGLISHCHECKER reports as mispelled but HAWAIIANCHECKER
+   does not = 7
+       --> example words:
+       	   	   edu
+		   http
+
+   number of words that HAWAIIANCHECKER reports as mispelled but ENGLISHCHECKER
+   does not = 540
+       --> example words:
+       	   	   '
+		   'a
+       	   	   a
+		   able
+
+   commands used:
+   
+   cat assign3.html | tr -cs 'A-Za-z' '[\n*]' | tr '[[:upper:]]' '[[:lower:]]' |
+   sort -u | comm -23 - words >englishchecker
+       		      	     	      --> writes all of the words that ENGLISHCHECKER
+				      	  reports as mispelled on the assignment 3
+					  webpage (ie "assign3.html") to the file
+					  "englishchecker"
+
+   cat assign3.html | tr '[[:upper:]]' '[[:lower:]]' | tr -cs "'a-z" '[\n*]' |
+   sort -u | comm -23 - hwords >hawaiianchecker
+       		      	 	      --> writes all of the words that HAWAIIANCHECKER
+				          reports as mispelled on the assignment 3
+					  webpage (ie "assign3.html) to the file
+					  "hawaiianchecker"
+
+   comm -23 englishchecker hawaiianchecker
+				     --> displays all of the words that ENGLISHCHECKER
+				     	 considers to be misppelled and HAWAIIANCHECKER
+					 does not (ie generates a list of all of the
+					 words that are uniqe to the file
+					 "englishchecker")
+   comm -23 englishchecker hawaiianchecker | wc -l
+   	    		   	     --> counts the number of words that ENGLISHCHECKER
+				     	 considers to be mispelled and HAWAIIANCHECKER
+					 does not (ie counts the number of newline
+					 characters in the list of words that are
+					 unique to the file "englishchecker")
+
+   comm -23 hawaiianchecker englishchecker
+				    --> displays all of the words that HAWAIIANCHECKER
+				     	 considers to be misppelled and ENGLISHCHECKER
+					 does not (ie generates a list of all of the
+					 words that are uniqe to the file
+					 "hawaiianchecker")
+
+   comm -23 hawaiianchecker englishchecker | wc -l
+   	    		            --> counts the number of words that HAWAIIANCHECKER
+				     	 considers to be mispelled and ENGLISHCHECKER
+					 does not (ie counts the number of newline
+					 characters in the list of words that are
+					 unique to the file "hawaiianchecker")

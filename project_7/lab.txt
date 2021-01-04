@@ -1,0 +1,355 @@
+Name: Joseph Picchi
+UID : 605124511
+35L Assignment 7
+
+========
+lab.txt
+========
+
+1. Lab Question 1:
+
+   wget https://web.cs.ucla.edu/classes/spring20/cs35L/assign/simpgmp.c
+					--> downloads the simpgmp.c program as
+					    the file "simpgmp.c" in the current
+					    directory.
+
+   gcc -o simpgmp -lgmp simpgmp.c       --> compiles simpgmp.c, links it
+       	  	  			    with the library "libgmp", and
+					    names the executable "simpgmp"
+
+   ./simpgmp 5				--> run the "simpgmp" program to make
+   	     				    sure we compiled/linked the
+					    executable correctly.
+					--> output: 32
+
+
+2. Lab Question 2:
+
+   ./simpgmp 24				--> uses the "simpgmp" program to
+   	     				    compute 2**24
+					--> output: 16777216
+
+   ./simpgmp 16777216 >output.txt       --> uses the "simpgmp" program to
+   	     	      			    compute 2**(2**24), and places
+					    the result in the file
+					    "output.txt"
+
+   egrep -o "[[:digit:]]" <output.txt | wc -l
+   	    		  	        --> matches each decimal digit in
+					    the file, places each digit on
+					    a separate line, and counts the
+					    number of lines, thus verifying
+					    that 2**(2**24) has 5,050,446
+					    decimal digits
+					--> output: 5050446
+
+   less output.txt			--> displays a screenful of contents
+   					    from "output.txt", thus allowing
+					    me to verify that 2**(2**24)
+					    begins with "1818"
+
+   cat output.txt			--> prints the contents of "output.txt"
+       					    to the terminal, thus allowing
+					    me to verify that 2**(2**24) ends
+					    with "7536"
+
+
+3. Lab Question 3:
+
+   ldd simpgmp
+       --> output:
+		linux-vdso.so.1 =>  (0x00007ffe4a316000)
+		libgmp.so.10 => /lib64/libgmp.so.10 (0x00007f85732fe000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007f8572f30000)
+		/lib64/ld-linux-x86-64.so.2 (0x00007f8573576000)
+	--> Thus, we can see that the "simpgmp" program relies on 4 dynamic
+	    libraries:
+	    (1) "linux-vdso.so.1" - a small library that the kernel
+	    			    automatically maps into address space of
+				    all user-space applications. The vDSO is
+				    most commonly called by the C library.
+	    (2) "libgmp.so.10" - the "gmp" library that I linked explicitly
+	    		       	 with the flag "-lgmp" in question 1.
+	    (3) "libc.so.6" - an overview of the standard C libraries on linux
+	    		      (description from the man page)
+	    (4) "ld-linux-x86-64.so.2" - a dynamic linker and loader
+	    			       	 (description from man page)
+
+
+4. Lab Question 4:
+
+   strace -C ./simpgmp 24	--> run the "strace" command to generate a
+   	     	       		    runtime report and post-runtime summary
+				    (specified by the "-C" option) of the
+				    system calls that "simpgmp" invokes
+
+	--> output (from the post-runtime summary only):
+
+	    % time     seconds  usecs/call     calls    errors syscall
+	    ------ ----------- ----------- --------- --------- ----------------
+	     41.18    0.000063          11         6           mprotect
+	     16.99    0.000026           7         4           brk
+	     15.69    0.000024          24         1           munmap
+	     13.07    0.000020          20         1           write
+	      7.19    0.000011           1        10           mmap
+	      5.88    0.000009           2         4           fstat
+	      0.00    0.000000           0         2           read
+	      0.00    0.000000           0         3           open
+	      0.00    0.000000           0         3           close
+	      0.00    0.000000           0         1         1 access
+	      0.00    0.000000           0         1           execve
+	      0.00    0.000000           0         1           arch_prctl
+	    ------ ----------- ----------- --------- --------- ----------------
+	    100.00    0.000153                    37         1 total
+   
+	--> Thus, all of the system calls that "simpgmp" invokes, with the
+	    descriptions found in their man pages, are:
+	    (1) "mprotect" - sets protections on a region of memory, changing
+	    		     protection for the calling process's memory page(s)
+			     that contain any part of the specified address
+			     range.
+	    (2) "brk" - changes the data segment size, thus having the effect
+	    	      	of allocating or de-allocation memory from a process
+	    (3) "munmap" - deletes the mappings for a specified address range,
+	    		   thus, causing future address references within that
+			   range to produce invalid memory references.
+	    (4) "write" - sends a message to another user by copying lines
+	    		  from your terminal to theirs.
+	    (5) "mmap" - creates a new mapping in the virtual address space
+	    	       	 of the calling process.
+            (6) "fstat" - retrieves information about the file specified
+	    		  by a given file descriptor.
+	    (7) "read" - attempts to read up to a specified number of bytes
+	    	       	 from a file into a buffer.
+	    (8) "open" - returns a file descriptor for use in future system
+	    	       	 calls.
+	    (9) "close" - closes a file descriptor so that it no longer
+	    		  refers to a file, and so that it can be reused.
+	   (10) "access" - checks whether the calling process has permissions
+	   		   to access a given file.
+ 	   (11) "execve" - executes the program pointed to by the filename.
+	   (12) "arch_prctl" - sets architecture-specific process or thread
+	   		       state.
+
+	--> By inspecting the runtime results of "strace", the system calls
+	    related to dynamic linking are:
+	    (1) "access" - checks if I have permissions to access shared
+	    		   libraries and their component files
+			   (e.g. "ld.so.preload")
+	    (2) "open" - returns a file descriptor to a shared library so
+	    	       	 that "simpgmp" can use library methods.
+			 (e.g. "open" is called on "ld.so.cache" and
+			 "libgmp.so.10")
+	    (3) "fstat" - retrieves information about the shared library
+	    		  using the file descriptor for the library
+			  (e.g. "fstat" is called on "ld.so.cache" using
+			  file descriptor "3")
+	    (4) "mmap" - maps shared libraries to memory (specifically, it
+	    	       	 maps the shared library to the virtual address
+			 space of "simpgmp")
+			 (e.g. "mmap" is called on "ld.so.cache" using file
+			 descriptor "3")
+	    (5) "close" - closes the file descriptor generated by "open"
+	    		  for the shared library
+			  (e.g. "close" is called on file descriptor "3",
+			  which was specific to "ld.so.cache")
+	    (6) "read" - reads up to a specified number of bytes from the
+	    	       	 shared library into a buffer.
+			 (e.g. reads up to 832 bytes from "libgmp.so.10",
+			 which is specified by file descriptor "3")
+	    (7) "mprotect" - changes access permissions so that the memory
+	    		     occupied by the shared library methods is
+			     read-only and the memory occupied by the
+			     original shared library files cannot be
+			     accessed at all.
+			     (e.g. "mprotect" makes the memory occupied
+			     by "libc.so.6" at address "0x7fee7cdf7000"
+			     read-only)
+	    (8) "munmap" - deletes the address mapping for shared libraries
+	    		   that are no longer needed so that their memory
+			   is no longer accessible.
+			   (e.g. "munmap" deletes the mapping of
+			   "ld.so.cache" located at "0x7f4f231c1000")
+
+
+5. Lab Question 5:
+
+   ls /usr/bin | awk '(NR-605124511)%251 == 0'
+      	       	     			    --> (as stated in the spec)obtains
+					    	a list of 10 commands to
+						investigate
+		--> output:
+			btrecord
+			docbook2txt
+			gpg-connect-agent
+			jar
+			localedef
+			nmtui-edit
+			pmlc
+			setfont
+			tzselect
+			zless
+
+
+6. Lab Question 6:
+
+   cd /usr/bin		--> navigate to the "/usr/bin" directory
+
+   ldd btrecord		--> output:
+			       linux-vdso.so.1 =>  (0x00007ffcd35ec000)
+			       libc.so.6 => /lib64/libc.so.6 (0x00007fc6acf11000)
+			       /lib64/ld-linux-x86-64.so.2 (0x00007fc6ad2df000)
+
+   ldd docbook2txt	--> output (error):
+       			       not a dynamic executable
+			--> reasoning: by running "less docbook2txt", I found
+			    that we get an error because "docbook2txt"
+			    is a bash script, and thus does not support
+			    dynamic linking.
+
+   ldd gpg-connect-agent
+			--> output:
+		linux-vdso.so.1 =>  (0x00007ffdd7184000)
+		libassuan.so.0 => /lib64/libassuan.so.0 (0x00007f6a0f1d1000)
+		libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x00007f6a0efcc000)
+		libpth.so.20 => /lib64/libpth.so.20 (0x00007f6a0edb6000)
+		libdl.so.2 => /lib64/libdl.so.2 (0x00007f6a0ebb2000)
+		libnsl.so.1 => /lib64/libnsl.so.1 (0x00007f6a0e998000)
+		libreadline.so.6 => /lib64/libreadline.so.6 (0x00007f6a0e752000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007f6a0e384000)
+		/lib64/ld-linux-x86-64.so.2 (0x00007f6a0f3e2000)
+		libtinfo.so.5 => /lib64/libtinfo.so.5 (0x00007f6a0e15a000)
+
+   ldd jar 		--> output:
+		linux-vdso.so.1 =>  (0x00007ffd1d754000)
+		libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f091a58e000)
+		libz.so.1 => /lib64/libz.so.1 (0x00007f091a378000)
+		libjli.so => not found
+		libdl.so.2 => /lib64/libdl.so.2 (0x00007f091a174000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007f0919da6000)
+		/lib64/ld-linux-x86-64.so.2 (0x00007f091a7aa000)
+
+   ldd localedef	--> output:
+        	linux-vdso.so.1 =>  (0x00007fff6dfdc000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007f9f51405000)
+		/lib64/ld-linux-x86-64.so.2 (0x00007f9f517d3000)
+
+   ldd nmtui-edit	--> output (first 5 of 37 lines):
+		linux-vdso.so.1 =>  (0x00007ffce03d1000)
+		libnm.so.0 => /lib64/libnm.so.0 (0x00007f31fc1e4000)
+		libssl3.so => /lib64/libssl3.so (0x00007f31fbf8b000)
+		libsmime3.so => /lib64/libsmime3.so (0x00007f31fbd63000)
+		libnss3.so => /lib64/libnss3.so (0x00007f31fba34000)
+
+   ldd pmlc		--> output (first 5 of 41 lines):
+		linux-vdso.so.1 =>  (0x00007ffd7b7f4000)
+		libpcp.so.3 => /lib64/libpcp.so.3 (0x00007fe5689d7000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007fe568609000)
+		libssl3.so => /lib64/libssl3.so (0x00007fe5683b0000)
+		libnss3.so => /lib64/libnss3.so (0x00007fe568081000)
+
+   ldd setfont		--> output:
+		linux-vdso.so.1 =>  (0x00007ffe1f1ae000)
+		libc.so.6 => /lib64/libc.so.6 (0x00007ff022c8e000)
+		/lib64/ld-linux-x86-64.so.2 (0x00007ff02305c000)
+
+   ldd tzselect         --> output (error):
+       			    	   not a dynamic executable
+			--> reasoning: by running "less tzselect", we
+			    find that "tzselect" is a bash script and
+			    thus does not support dynamic linking
+
+   ldd zless		--> output (error):
+       			    	   not a dynamic executable
+			--> reasoning: by running "less zless", we find
+			    that "zless" is a bash script and thus does
+			    not support dynamic linking.
+
+
+7. Lab Question 7:
+
+   I wrote a bash script that produces a list of every dynamic library
+   outputed by any of the above commands, including duplicates
+
+	 #START OF BASH SCRIPT                                                                    
+	 #!/bin/bash                                                                              
+	 for temp in $(ls /usr/bin | awk '(NR-605124511)%251 == 0'); do
+	     ldd ${temp} | grep ".so"
+	 done
+
+	 #END OF BASH SCRIPT 
+
+
+   chmod a+x ~/duplicateListMaker.sh
+				--> add execute permissions to the
+   	    			    bash script
+
+   ./listMaker.sh | sed -r "s/=?>? *\(0x.*\)//g" | sort -u >~/output.txt
+				--> runs the script, then sorts the
+				    list of outputted dynamic libraries,
+				    removing any duplicates
+				--> places the sorted list in the file
+				    "~/output.txt"
+
+   contents of "~/output.txt" (ie the sorted list):
+
+	/lib64/ld-linux-x86-64.so.2
+	libassuan.so.0 => /lib64/libassuan.so.0
+	libattr.so.1 => /lib64/libattr.so.1
+	libavahi-client.so.3 => /lib64/libavahi-client.so.3
+	libavahi-common.so.3 => /lib64/libavahi-common.so.3
+	libblkid.so.1 => /lib64/libblkid.so.1
+	libbz2.so.1 => /lib64/libbz2.so.1
+	libc.so.6 => /lib64/libc.so.6
+	libcap.so.2 => /lib64/libcap.so.2
+	libcom_err.so.2 => /lib64/libcom_err.so.2
+	libcrypt.so.1 => /lib64/libcrypt.so.1
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3
+	libdl.so.2 => /lib64/libdl.so.2
+	libdw.so.1 => /lib64/libdw.so.1
+	libelf.so.1 => /lib64/libelf.so.1
+	libffi.so.6 => /lib64/libffi.so.6
+	libfreebl3.so => /lib64/libfreebl3.so
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11
+	libgio-2.0.so.0 => /lib64/libgio-2.0.so.0
+	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0
+	libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0
+	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0
+	libgssapi_krb5.so.2 => /lib64/libgssapi_krb5.so.2
+	libjli.so => not found
+	libk5crypto.so.3 => /lib64/libk5crypto.so.3
+	libkeyutils.so.1 => /lib64/libkeyutils.so.1
+	libkrb5.so.3 => /lib64/libkrb5.so.3
+	libkrb5support.so.0 => /lib64/libkrb5support.so.0
+	liblz4.so.1 => /lib64/liblz4.so.1
+	liblzma.so.5 => /lib64/liblzma.so.5
+	libm.so.6 => /lib64/libm.so.6
+	libmount.so.1 => /lib64/libmount.so.1
+	libnewt.so.0.52 => /lib64/libnewt.so.0.52
+	libnm.so.0 => /lib64/libnm.so.0
+	libnsl.so.1 => /lib64/libnsl.so.1
+	libnspr4.so => /lib64/libnspr4.so
+	libnss3.so => /lib64/libnss3.so
+	libnssutil3.so => /lib64/libnssutil3.so
+	libpcp.so.3 => /lib64/libpcp.so.3
+	libpcre.so.1 => /lib64/libpcre.so.1
+	libplc4.so => /lib64/libplc4.so
+	libplds4.so => /lib64/libplds4.so
+	libpth.so.20 => /lib64/libpth.so.20
+	libpthread.so.0 => /lib64/libpthread.so.0
+	libreadline.so.6 => /lib64/libreadline.so.6
+	libresolv.so.2 => /lib64/libresolv.so.2
+	librt.so.1 => /lib64/librt.so.1
+	libsasl2.so.3 => /lib64/libsasl2.so.3
+	libselinux.so.1 => /lib64/libselinux.so.1
+	libslang.so.2 => /lib64/libslang.so.2
+	libsmime3.so => /lib64/libsmime3.so
+	libssl3.so => /lib64/libssl3.so
+	libsystemd.so.0 => /lib64/libsystemd.so.0
+	libtinfo.so.5 => /lib64/libtinfo.so.5
+	libudev.so.1 => /lib64/libudev.so.1
+	libuuid.so.1 => /lib64/libuuid.so.1
+	libz.so.1 => /lib64/libz.so.1
+	linux-vdso.so.1

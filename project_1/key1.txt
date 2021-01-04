@@ -1,0 +1,307 @@
+Joseph Picchi
+605124511
+Assignment 1
+Homework
+---------------
+
+------------------------------------
+Exercise 1.1: Moving around in Emacs
+------------------------------------
+
+1.1.1)
+I ran the following shell command to edit "exer1.html":
+"emacs exer1.html"
+
+1.1.2)
+C-s H T M L Enter
+
+1.1.3)
+C-s s c Enter M-b
+
+1.1.4)
+C-s s e Enter M-b
+
+1.1.5)
+C-s a r r Enter M-b
+
+1.1.6)
+C-e
+
+1.1.7)
+C-a
+
+1.1.8)
+None of the above tasks were performed using arrow keys
+
+1.1.9)
+No, none of the above tasks were performed using arrow keys
+
+1.1.10)
+C-x C-c
+
+
+----------------------------------
+Exercise 1.2: Deleting Text in Emacs
+----------------------------------
+
+1.2.1)
+shell command to start editing in emacs:
+"emacs exer2.html"
+
+1.2.2)
+C-u 1 9 C-n C-k
+
+1.2.3)
+C-s D E Enter C-a C-k
+
+1.2.4)
+C-s w i k i C-s C-s enter M-{ C-SP M-} C-w
+
+1.2.5)
+C-s < - - Enter C-e C-SP M-{ C-p C-w C-s < ! Enter C-a C-k C-r < ! Enter M-z . .
+
+
+-------------------------------------
+Exercise 1.3: Inserting text in Emacs
+-------------------------------------
+
+1.3.1)
+Used the following shell command to begin editing in Emacs:
+emacs exer3.html
+
+1.3.2)
+M-% A s s i g n m e n t 1 Enter A s s i g n m e n t 4 2 Enter SP ,
+
+1.3.3)
+M-< M-% U T F - 8 Enter U S - A S C I I Enter ,
+
+1.3.4)
+M-< C-M-s [ ^ [ : a s c i i : ] ] C-k M-0 C-k
+
+1.3.5)
+M-< C-s < / o l > Enter Enter
+
+1.3.6)
+C-x C-s C-x C-c
+
+Shell command to create and check the diff file:
+diff -u exer1.html exer3.html >exer3.diff   --> created the diff file
+emacs exer3.diff   	      		    --> to view the diff file
+
+
+------------------------------------------
+Exercise 1.4: Other editing tasks in Emacs
+------------------------------------------
+
+1.4.1)
+ran the shell command:
+cat exer2.html exer2.diff >exer4.html
+
+
+1.4.2)
+ran the following shell command:
+emacs exer4.html   --> to begin editing "exer4.html" in Emacs
+
+
+1.4.3)
+for the "end of HTML resource" comment:
+M-> C-r < Enter C-SP C-e M-w C-r < / h t m l > C-r Enter C-n C-y
+
+for the "or maybe more lines" comment:
+M-> C-r - > C-r C-e C-SP C-u 3 C-p C-u 3 C-b M-w C-r < / s e c Enter C-p C-y
+
+for the "<!---->" comment:
+M-> C-s < ! - - - Enter C-SP C-u 7 C-f M-w C-r n o C-r Enter C-u 8 C-f C-y
+
+for the "You can learn more" comment:
+M-> C-r < ! - - SP Y Enter C-SP M-} M-w C-r i t < / Enter C-n C-y
+
+for the "DELETE-ME" comment:
+M-> C-r D E Enter C-e C-SP C-a M-w C-r H o m C-r Enter C-n C-n C-y
+
+for the chinese characters comment:
+M-> C-r i f f , Enter C-a C-f C-SP C-e M-w C-r h u n t C-r Enter C-n C-n C-y
+
+
+1.4.4)
+The process was repeated such that the earlier part of the file now resembles the original.
+
+
+1.4.5)
+M-> C-SP C-r e x e r 1 Enter C-a Backspace
+
+
+1.4.6)
+C-x u
+
+
+1.4.7)
+M-> - - > C-r e x e r 1 Enter C-a Enter C-p < ! - - M-% < ! - - Enter n o n e Enter SP SP SP SP SP SP C-r < ! - - Enter M-% - - > Enter n o n e Enter SP SP SP SP SP SP Enter
+
+
+1.4.8)
+There were 7 occurances of "<ol>"
+
+M-< M-% < 0 l > Enter < o L > Enter SP SP SP SP SP SP SP
+
+
+1.4.9)
+I copied the "exer4.html" file to my computer using the shell command:
+scp picchi@lnxsrv06.seas.ucla.edu:/u/be/ugrad/picchi/exer4.html /Users/josephpicchi/Downloads
+
+When viewing the "exer4.html" file, it appeared to be equivalent to the original in browser. The "exer4.diff" file correctly reported that the only changes to "exer4.html" were replacements of "<ol>" with "<oL>" and the addition of a long comment at the end.
+
+
+-------------------------------------
+Exercise 1.5: doing commands in Emacs
+-------------------------------------
+
+1.5.1)
+M-! m k d i r ~ / j u n k Enter
+
+
+1.5.2)
+C-x 2 C-x o C-x C-f j u n k / h e l l o . c Enter (copied_in_the_code) C-x C-s C-x o
+
+
+1.5.3)
+M-x c o m p i l e Enter Backspace Backspace Backspace Backspace Backspace Backspace Backspace Backspace Backspace  g c c SP - o SP h e l l o SP j u n k / h e l l o . c Enter y
+
+
+1.5.4)
+C-x b h e l l o - o u t Enter C-u M-! . / h e l l o
+
+
+1.5.5)
+buffer contents:
+EOF on input
+
+emacs commands:
+C-SP C-e M-w C-x o M-> C-y
+
+
+--------------------------------
+Exercise 1.6: running Elisp code
+--------------------------------
+
+1.6.1)
+C-x b Enter
+
+
+1.6.2)
+to evaluate "most-negative-fixnum":
+m o s t - n e g a t i v e - f i x n u m C-j
+
+the value of "most-negative-fixnum:
+-2305843009213693952
+
+to evaluate "most-positive-fixnum":
+m o s t - p o s i t i v e - f i x n u m C-j
+
+the value of "most-positive-fixnum":
+2305843009213693951
+
+to find out how to use "format":
+C-h f f o r m a t Enter
+
+to find the hex representation of "most-positive-fixnum" and "most-negative-fixnum", respectively:
+( f o r m a t SP " % x " SP m o s t - p o s i t i v e - f i x n u m ) C-j
+( f o r m a t SP " % x " SP m o s t - n e g a t i v e - f i x n u m ) C-j
+
+hex representations:
+most-positive-fixnum ---> "1fffffffffffffff"
+most-negative-fixnum ---> "2000000000000000"
+
+interpretation:
+The hex representations indicate that "most-positive-fixnum" is probably the largest
+integer that lisp can represent without overflowing, whereas the "most-negative-enum is
+probably the most negative integer that lisp can represent without overflowing.
+
+
+1.6.3)
+emacs commands:
+( r a n d o m SP " 6 0 5 - 1 2 4 - 5 1 1 " ) C-j
+
+result of the evaluation:
+1748118320216750888
+
+
+1.6.4)
+to assign a random value to x:
+( s e t q SP x SP ( r a n d o m ) ) C-j
+
+result of assignment for x:
+274471304708365971
+
+to assign a random value to y:
+( s e t q SP y SP ( r a n d o m ) ) C-j
+
+result of assignment to y:
+963764526117457197
+
+
+1.6.5)
+To compute p:
+( * SP x SP y ) C-j
+
+result for p:
+-2136651356505614633
+
+to compute r:
+( l o g i o r SP inserted_p_value m o s t - n e g a t i v e - f i x n u m ) C-j
+
+result for r:
+-2136651356505614633
+
+
+1.6.6)
+r is not equivalent to the mathematical product of x and y, since x and y are both positive, while r is negative.
+
+
+1.6.7)
+x and y are not random because the documentation for the "random" function
+in emacs states that the "random" function returns a "pseudo-random number", where
+emacs determines the value by using an argument (eg a string in the case of question
+1.6.3) to set the random number seed from the system's entropy pool. In the absence of an
+argument, it uses less-random volatile data such as time to determine the "random" value.
+In this way, x and y are not random because they are determined by an algorithm, thus
+introducing a degree of predictability in the way that the "random" numbers are generated.
+
+Another reason that the integers x and y are not random is because a mathematically
+random number is one that can assume any value in the range negative-infinity to
+positive-infinity. Since random integers x and y can only assume values in the range
+most-negative-fixnum to most-positive-fixnum, they are artificially bounded and thus
+are not mathematically random. The reason for this artificial constraint is that computers
+have finite memory storage, and storing larger values requires a greater amount of storage; thus
+computers could never store infinitely large or small values.
+
+
+1.6.8)
+From my answer to 1.6.2, we know that most-negative-fixnum is represented in hex as
+2000000000000000 . From this representation, we can extrapolate that each signed int in
+Lisp is represented by 15*4+2=62 bits. Therefore, if x and y are truly random, then they
+have equal probability of taking any value in the range -2^62 to (2^62)-1 . Therefore,
+each number in that range has a probability 1/(2*2^62) of being sampled. Based on the
+constraints, we know that overflow occurs if xy<-2^62 or xy>2^62-1 (we can approximate
+this second relation as xy>2^62). Thus, overflow occurs if |xy|>2^62. Therefore, the
+cases in which |x|>2^31 and |y|>2^31 will cause an overflow, so the lower bound of
+probability for overflow is:
+
+P(|x|>2^31 and |y|>2^31) = P(|x|>2^31)*P(|y|>2^31)
+
+Considering only the range 0 to 2^62 (the positive side of the spectrum), we know the
+amount of permutations with values 0 to 2^31 is much less than the amount of permutations
+with values 2^31 to 2^62 because the range 2^31 to 2^62 provides 31 extra bits that can
+be combined in different ways with the lower bits to produce approximate 2^31 times more
+permutations (since 2^62 = (2^31)^2 ). In fact, there are so many more permutations that we
+can comfortably make the approximation P(x>2^31)=1. The same reasoning, by symmetry, applies
+for the range -2^62 to 0, thus providing the approximation P(x<-2^31)=1. Thus we get the
+approximation P(|x|>2^31)=1. Since x and y are both random, we can apply the same approximation
+to y, thus yielding the result:
+
+P(|x|>2^31)*P(y>2^31)=1.
+
+Since the above probability was our lower bound of overflow, we can conclude that x*y overflows
+close to 100% of the time.
+
+Therefore, the probability that r is mathematically correct is close to 0.

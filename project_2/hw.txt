@@ -1,0 +1,72 @@
+Joseph Picchi
+605124511
+Assignment 2
+Homework
+
+=================================
+hw.txt : homework log and answers
+=================================
+
+gpg commands used in the key pair and signature generation processes:
+
+  1. gpg --version
+
+     used to verify that "gpg" on SEASnet is version 2.
+
+  2. gpg --gen-key  	 --> begin the key pair generation process
+     return		 --> select default type of key (ie RSA and RSA)
+     return		 --> select default key size (2048 bits long)
+     2w			 --> sets the key to expire in 2 weeks
+     (inputed user ID info)
+     (inputed a passphrase)
+
+  3. gpg --list-keys
+
+     used to ensure that the new key was made with the proper user ID
+
+  4. gpg --armor --export Joseph >>hw-pubkey.asc
+
+     used to export the newly created key with the user ID name "Joseph" into the file
+     "hw-pubkey.asc", where the "--armor" option specifies that the outputed should be
+     generated in a ASCII-armored format.
+
+  5. gpg --output hw-pubkey.sig detach-sig hw-pubkey.asc
+     (entered passphrase for the key)
+
+     This command created a detached signature in file named "hw-pubkey.sig", using
+     "hw-pubkey.asc" as the file for which the signature was created.
+
+
+Answers to homework questions:
+
+   1. Even if the the other teams had observed all the bytes going across the network in the lab
+      exercise, the network is still secure because all messages are encrypted using symmetric
+      encryption, where the only entities with the symmetric key necessary for decryption are
+      the client and the server.
+
+      Assumption 1 (that other teams had tapped the keyboards) changes my answer for 2 reasons.
+      First, the teams would be able to record my password to the key pair when I add it to SSH
+      agent, so they could use my key pair to log in to the server if they have access to the file
+      containing the keys. Secondly, they would be able to decipher what commands I am sending over
+      the network by tracking the sequences of characters I type on my keyboard.
+
+      Assumption 2 (that other teams temporarily had physical control of the USB) changes my
+      answer. By gaining physical access to the USB, the teams have also gained access to all of
+      the files containing my keys. They could therefore use the symmetric key to decrypt messages
+      being sent across the network, thus rendering the network insecure. Furthermore, assuming
+      that my private and public keys are not passphrase-protected, they could use these keys
+      to connect to the server via key-based authentication, thus providing another method to
+      determine the commands being sent across the network.
+
+   2. GPG digital signatures only go so far as to verify that the person who sent the file and
+      the person who signed the file are the same person. Therefore, the "gpg --verify" command
+      does not verify that I, personally, created the file in question; it only ensures that the
+      person who created it is also the person who signed it. In theory, and intermediate entity
+      could intercept the  file, edit it, create a new signature, and send it along with their
+      public key, and "gpg --verify" would still output "good signature".
+
+      We could fix this problem by checking that the public key used to verify the digital
+      signature matches my own personal public key, thus verifying that I am, in fact, the one
+      who created the digital signature. This could be accomplished using a trusted third party
+      (ie the certificate authority) that can verify that I am the true owner of the public key
+      in question.
